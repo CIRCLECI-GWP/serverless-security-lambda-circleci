@@ -523,6 +523,33 @@ Test it with:
 curl -X GET "https://YOUR-API-GATEWAY-URL/property"
 ```
 
+## Test
+
+### Get Function URL
+
+Lambda > Functions > [YOUR-LAMBDA]
+
+* Click the Configuration tab
+* Function URL > create
+* Auth type: AWS_IAM
+* Copy the Function URL
+* Add /property/123 to the route, ex:
+  https://bsavwnamwm4wu7yscertmrccwi0woshb.lambda-url.us-east-1.on.aws/property/123
+
+### Configure Postman for AWS Signature v4
+* Open Postman.
+* Select GET or POST (based on your Lambda function).
+* Paste the Function URL.
+* Go to the Authorization tab.
+* Select AWS Signature from the Type dropdown.
+* Enter your AWS credentials:
+* Access Key: YOUR_ACCESS_KEY
+* Secret Key: YOUR_SECRET_KEY
+* Session Token (if applicable)
+* AWS Region: Example: us-east-1
+* Service Name: Use lambda
+* Click Send.
+
 ---
 
 ### **🚀 Final Setup Recap**
