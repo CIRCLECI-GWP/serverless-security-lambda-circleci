@@ -33,11 +33,12 @@ const dbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
 let TABLE_NAME = "RealEstateListings";
+let DB_SECRET_NAME = "DBSecret2";
 
 // Retrieve secret (DynamoDB table name) securely
 async function getDBSecret() {
     try {
-        const data = await secretsClient.send(new GetSecretValueCommand({ SecretId: process.env.DB_SECRET_NAME }));
+        const data = await secretsClient.send(new GetSecretValueCommand({ SecretId: DB_SECRET_NAME }));
         const secret = JSON.parse(data.SecretString);
         TABLE_NAME = secret.tableName; // Example secret format: { "tableName": "RealEstateListings" }
     } catch (error) {
