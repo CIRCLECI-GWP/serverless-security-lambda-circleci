@@ -536,6 +536,28 @@ Lambda > Functions > [YOUR-LAMBDA]
 * Add /property/123 to the route, ex:
   https://bsavwnamwm4wu7yscertmrccwi0woshb.lambda-url.us-east-1.on.aws/property/123
 
+### Get credentials
+
+aws sts get-session-token
+
+### Create DynamoDB Secret
+
+```console
+aws secretsmanager create-secret --name "DBSecret" --secret-string '{"tableName":"RealEstateListings"}'
+```
+
+Now go to **AWS Secrets Manager > Secrets > DBSecret**
+
+Then edit the secret value to :
+
+```console
+{"tableName":"RealEstateListings"}
+```
+
+### Set environment variables
+
+$env:DB_SECRET_NAME="DBSecret"
+
 ### Configure Postman for AWS Signature v4
 * Open Postman.
 * Select GET or POST (based on your Lambda function).
