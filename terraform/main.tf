@@ -134,6 +134,17 @@ resource "aws_lambda_permission" "api_gateway_permission" {
   principal     = "apigateway.amazonaws.com"
 }
 
+resource "aws_secretsmanager_secret" "db_secret" {
+  name = "DBSecret2"
+}
+
+resource "aws_secretsmanager_secret_version" "db_secret_value" {
+  secret_id     = aws_secretsmanager_secret.db_secret.id
+  secret_string = jsonencode({
+    tableName = "RealEstateListings"
+  })
+}
+
 # ✅ Output API Gateway URL
 output "api_url" {
   value = aws_api_gateway_deployment.real_estate_deployment.invoke_url
