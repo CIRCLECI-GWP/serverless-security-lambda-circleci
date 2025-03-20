@@ -32,7 +32,7 @@ const secretsClient = new SecretsManagerClient({ region: process.env.AWS_REGION 
 const dbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
-let TABLE_NAME = "";
+let TABLE_NAME = "RealEstateListings";
 
 // Retrieve secret (DynamoDB table name) securely
 async function getDBSecret() {
@@ -56,9 +56,9 @@ function validateProperty(data) {
     if (!data.PropertyID || typeof data.PropertyID !== "string") return "Invalid PropertyID";
     if (!data.Title || typeof data.Title !== "string") return "Invalid Title";
     if (!data.Description || typeof data.Description !== "string") return "Invalid Description";
-    if (!["Rent", "Sale"].includes(data.Type)) return "Invalid Type (Must be 'Rent' or 'Sale')";
+    if (!["Rent", "Sale"].includes(data.PropertyType)) return "Invalid PropertyType (Must be 'Rent' or 'Sale')";
     if (typeof data.Price !== "number" || data.Price < 0) return "Invalid Price";
-    if (!data.Location || typeof data.Location !== "string") return "Invalid Location";
+    if (!data.PropertyLocation || typeof data.PropertyLocation !== "string") return "Invalid PropertyLocation";
     return null;
 }
 
@@ -100,20 +100,20 @@ app.get("/property/:id", async (req, res) => {
 
 // ✅ Update a property
 app.put("/property/:id", async (req, res) => {
-    const { Title, Description, Type, Price, Location } = req.body;
-    if (!Title && !Description && !Type && !Price && !Location) return res.status(400).json({ error: "No fields to update" });
+    const { Title, Description, PropertyType, Price, PropertyLocation } = req.body;
+    if (!Title && !Description && !PropertyType && !Price && !PropertyLocation) return res.status(400).json({ error: "No fields to update" });
 
     try {
         const params = new UpdateCommand({
             TableName: TABLE_NAME,
             Key: { PropertyID: req.params.id },
-            UpdateExpression: "SET Title = :t, Description = :d, Type = :ty, Price = :p, Location = :l",
+            UpdateExpression: "SET Title = :t, Description = :d, PropertyType = :ty, Price = :p, PropertyLocation = :l",
             ExpressionAttributeValues: {
                 ":t": Title,
                 ":d": Description,
-                ":ty": Type,
+                ":ty": PropertyType,
                 ":p": Price,
-                ":l": Location,
+                ":l": PropertyLocation,
             },
             ConditionExpression: "attribute_exists(PropertyID)", // Ensure the property exists
         });
