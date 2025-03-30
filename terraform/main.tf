@@ -135,7 +135,7 @@ resource "aws_lambda_permission" "api_gateway_permission" {
 }
 
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "DBSecret2"
+  name = "DBSecret4"
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_value" {

@@ -543,10 +543,10 @@ aws sts get-session-token
 ### Create DynamoDB Secret
 
 ```console
-aws secretsmanager create-secret --name "DBSecret2" --secret-string '{"tableName":"RealEstateListings"}'
+aws secretsmanager create-secret --name "DBSecret4" --secret-string '{"tableName":"RealEstateListings"}'
 ```
 
-Now go to **AWS Secrets Manager > Secrets > DBSecret2**
+Now go to **AWS Secrets Manager > Secrets > DBSecret4**
 
 Then edit the secret value to :
 
@@ -556,7 +556,7 @@ Then edit the secret value to :
 
 ### Set environment variables
 
-$env:DB_SECRET_NAME="DBSecret2"
+$env:DB_SECRET_NAME="DBSecret4"
 
 ### Configure Postman for AWS Signature v4
 * Open Postman.

@@ -13,13 +13,6 @@ const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client
 const dotenv = require("dotenv");
 const serverless = require("serverless-http");
 
-// import express from "express";
-// import helmet from "helmet";
-// import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-// import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, DeleteCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-// import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-// import dotenv from "dotenv";
-
 // Load environment variables
 dotenv.config();
 
@@ -33,7 +26,7 @@ const dbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
 let TABLE_NAME = "RealEstateListings";
-let DB_SECRET_NAME = "DBSecret2";
+let DB_SECRET_NAME = "DBSecret4";
 
 // Retrieve secret (DynamoDB table name) securely
 async function getDBSecret() {
@@ -93,7 +86,7 @@ app.get("/property/:id", async (req, res) => {
         const data = await docClient.send(params);
         if (!data.Item) return res.status(404).json({ error: "Property not found" });
 
-        res.json(data.Item);
+        res.status(201).json(data.Item);
     } catch (err) {
         res.status(500).json({ error: "Error fetching property", details: err.message });
     }
@@ -120,7 +113,7 @@ app.put("/property/:id", async (req, res) => {
         });
 
         await docClient.send(params);
-        res.json({ message: "Property updated successfully" });
+        res.status(200).json({ message: "Property updated successfully" });
     } catch (err) {
         res.status(500).json({ error: "Error updating property", details: err.message });
     }
@@ -136,7 +129,7 @@ app.delete("/property/:id", async (req, res) => {
         });
 
         await docClient.send(params);
-        res.json({ message: "Property deleted successfully" });
+        res.status(200).json({ message: "Property deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: "Error deleting property", details: err.message });
     }
@@ -151,7 +144,7 @@ app.get("/properties", async (req, res) => {
         });
 
         const data = await docClient.send(params);
-        res.json(data.Items);
+        res.status(200).json(data.Items);
     } catch (err) {
         res.status(500).json({ error: "Error fetching properties", details: err.message });
     }

@@ -1,44 +1,116 @@
 version: 2.1
 
-executors:
-  node-executor:
-    docker:
-      - image: circleci/node:18
+orbs:
+  terraform: circleci/terraform@3.6.0
+  aws-cli: circleci/aws-cli@4.1.2
 
 jobs:
-  test:
-    executor: node-executor
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Run Tests
-          command: npm test
 
-  deploy:
-    executor: node-executor
+  project_checkout:
+    machine:
+      image: ubuntu-2204:edge
+      docker_layer_caching: true
     steps:
       - checkout
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  build_lambdas:
+    docker:
+      - image: cimg/node:21.4.0
+    working_directory: ~/project
+    steps:
+      - attach_workspace:
+          at: ./
       - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Deploy to AWS Lambda
           command: |
-            aws lambda update-function-code \
-              --function-name $AWS_LAMBDA_FUNCTION_NAME \
-              --zip-file fileb://lambda.zip
+            cd src/lambda-functions
+            npm ci
+            npm run build
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - . #src/lambda-functions/deployment
+
+  plan_infrastructure:
+    executor: terraform/default
+    parameters:
+      env:
+        type: string
+      env_suffix:
+        type: string
+    steps:
+      - attach_workspace:
+          at: "./"
+#      - run: echo "Executing terraform destroy"
+#      - terraform/destroy:
+#          path: infrastructure/environments/<< parameters.env >>
+#          backend_config: |
+#            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
+#            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+#          var: |
+#            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
+#            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+      - run: echo "Executing terraform init"      
+      - terraform/init:
+          path: infrastructure/environments/<< parameters.env >>
+          backend_config: |
+            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
+            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+      - run: echo "Executing terraform plan"
+      - terraform/plan:
+          path: infrastructure/environments/<< parameters.env >>
+          var: |
+            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
+            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+      - persist_to_workspace:
+          paths:
+            - "."
+          root: "~"
+
+  apply_infrastructure:
+    executor: terraform/default
+    parameters:
+      env:
+        type: string
+      env_suffix:
+        type: string
+    steps:
+      - attach_workspace:
+          at: "./"
+      - run: echo "Executing terraform apply"
+      - terraform/apply:
+          path: infrastructure/environments/<< parameters.env >>
+          backend_config: |
+            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
+            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+          var: |
+            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
+            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+      - persist_to_workspace:
+          paths:
+            - "."
+          root: "~"
 
 workflows:
-  version: 2
-  test-and-deploy:
+ ci-cd:
     jobs:
-      - test
-      - deploy:
+      - project_checkout
+      - build_lambdas:
+          name: build_lambdas
+          requires: 
+            - project_checkout
+      - plan_infrastructure:
+          name: plan_infrastructure
+          env:  "sandbox"
+          env_suffix: "_SANDBOX"
           requires:
-            - test
-          filters:
-            branches:
-              only: main
+            - build_lambdas
+      - apply_infrastructure:
+          name: apply_infrastructure
+          env:  "sandbox"
+          env_suffix: "_SANDBOX"
+          requires:
+            - plan_infrastructure

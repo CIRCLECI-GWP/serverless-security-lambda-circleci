@@ -167,3 +167,11 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+lambda.zip
+infrastructure/modules/lambda-functions/.terraform*
+infrastructure/modules/lambda-functions/.terraform/*
+infrastructure/environments/sandbox/.terraform*
+infrastructure/environments/sandbox/.terraform/*
+terraform.tfstate
+terraform.tfstate.backup
