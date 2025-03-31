@@ -11,8 +11,6 @@ terraform {
     key            = "terraform/state.tfstate"
     region         = "us-east-1"
     use_lockfile   = true
-    # access_key     = var.terraform_aws_access_key
-    # secret_key     = var.terraform_aws_secret_key
   }
 }
 
