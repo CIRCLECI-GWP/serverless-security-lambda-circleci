@@ -28,7 +28,6 @@ jobs:
           command: |
             cd src/lambda
             npm ci
-            npm run build
       - persist_to_workspace:
           root: ~/
           paths:
