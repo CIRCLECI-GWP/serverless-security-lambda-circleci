@@ -178,20 +178,20 @@ resource "aws_secretsmanager_secret_version" "db_secret_value" {
 resource "aws_iam_role" "lambda_exec" {
   name = "serverless_real_estate_lambda"
 
-  assume_role_policy =
+  assume_role_policy = jsonencode(
 	{
 	  "Version": "2012-10-17",
 	  "Statement": [
 		{
 		  "Action": "sts:AssumeRole",
-		  "Principal": {
-			"Service": "lambda.amazonaws.com"
-		  },
 		  "Effect": "Allow",
 		  "Sid": ""
+		  "Principal": {
+			  "Service": "lambda.amazonaws.com"
+		  },
 		}
 	  ]
-	}
+	})
 }
 
 resource "aws_api_gateway_rest_api" "real_estate_lambda" {
