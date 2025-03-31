@@ -26,13 +26,13 @@ jobs:
           at: ./
       - run:
           command: |
-            cd src/lambda-functions
+            cd src/lambda
             npm ci
             npm run build
       - persist_to_workspace:
           root: ~/
           paths:
-            - . #src/lambda-functions/deployment
+            - .
 
   plan_infrastructure:
     executor: terraform/default
@@ -44,15 +44,6 @@ jobs:
     steps:
       - attach_workspace:
           at: "./"
-#      - run: echo "Executing terraform destroy"
-#      - terraform/destroy:
-#          path: infrastructure/environments/<< parameters.env >>
-#          backend_config: |
-#            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
-#            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
-#          var: |
-#            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
-#            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
       - run: echo "Executing terraform init"      
       - terraform/init:
           path: infrastructure/environments/<< parameters.env >>

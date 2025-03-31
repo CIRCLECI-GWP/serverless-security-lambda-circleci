@@ -7,12 +7,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "tf-state-bucket-20250330-2000"
+    bucket         = "tf-state-bucket-20250330-1726"
     key            = "terraform/state.tfstate"
     region         = "us-east-1"
     use_lockfile   = true
-    # access_key     = var.terraform_aws_access_key
-    # secret_key     = var.terraform_aws_secret_key
+    access_key     = var.terraform_aws_access_key
+    secret_key     = var.terraform_aws_secret_key
   }
 }
 
@@ -24,8 +24,6 @@ provider "aws" {
 }
 
 #Call module lambda Terraform
-module "lambda" {
-  source                   = "../../modules/lambda"
-  terraform_aws_access_key = var.terraform_aws_access_key
-  terraform_aws_secret_key = var.terraform_aws_secret_key
+module "lambda-functions" {
+  source                   = "../../modules/lambda-functions"
 }

@@ -169,9 +169,7 @@ override.tf.json
 terraform.rc
 
 lambda.zip
-infrastructure/modules/lambda-functions/.terraform*
-infrastructure/modules/lambda-functions/.terraform/*
-infrastructure/environments/sandbox/.terraform*
-infrastructure/environments/sandbox/.terraform/*
+*/.terraform*
+*/.terraform/*
 terraform.tfstate
 terraform.tfstate.backup

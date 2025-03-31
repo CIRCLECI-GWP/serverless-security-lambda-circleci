@@ -55,10 +55,8 @@ resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
 # ✅ Attach Policy to Role
 resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.ts_lambda_role.name
+  role       = aws_iam_role.lambda_role.name
 }
-
-
 
 # Creating zip file
 data "archive_file" "application-code" {
@@ -77,7 +75,6 @@ resource "aws_lambda_function" "real_estate_lambda" {
   runtime           = "nodejs20.x"
   memory_size       = 1024
   timeout           = 300
-  )
 
   environment {
     variables = {
@@ -90,7 +87,7 @@ resource "aws_lambda_function" "real_estate_lambda" {
   }
 }
 
-# Creating "ts_lambda_role" role
+# Creating "lambda_role" role
 resource "aws_iam_role" "lambda_role" {
   name = "lambda-role"
   assume_role_policy = jsonencode(
@@ -164,7 +161,7 @@ resource "aws_lambda_permission" "api_gateway_permission" {
 }
 
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "DBSecret4"
+  name = "DBSecret6"
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_value" {
