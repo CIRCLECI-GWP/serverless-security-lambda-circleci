@@ -46,17 +46,17 @@ resource "aws_iam_policy" "dynamodb_policy" {
 }
 
 
-# ✅ Attach Policy to Role
-resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
-  policy_arn = aws_iam_policy.dynamodb_policy.arn
-  role       = aws_iam_role.lambda_role.name
-}
-
-# ✅ Attach Policy to Role
-resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.lambda_role.name
-}
+# # ✅ Attach Policy to Role
+# resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
+#   policy_arn = aws_iam_policy.dynamodb_policy.arn
+#   role       = aws_iam_role.lambda_role.name
+# }
+# 
+# # ✅ Attach Policy to Role
+# resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+#   role       = aws_iam_role.lambda_role.name
+# }
 
 # Creating zip file
 data "archive_file" "application-code" {
@@ -70,7 +70,7 @@ resource "aws_lambda_function" "real_estate_lambda" {
   filename          = data.archive_file.application-code.output_path
   source_code_hash  = data.archive_file.application-code.output_base64sha256
   function_name     = "real_state_api"
-  role              = aws_iam_role.lambda_role.arn
+  # role              = aws_iam_role.lambda_role.arn
   handler           = "index.handler"
   runtime           = "nodejs20.x"
   memory_size       = 1024
@@ -89,31 +89,31 @@ resource "aws_lambda_function" "real_estate_lambda" {
   }
 }
 
-# Creating "lambda_role" role
-resource "aws_iam_role" "lambda_role" {
-  name = "lambda-role"
-  assume_role_policy = jsonencode(
-    {
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = "sts:AssumeRole"
-          Effect = "Allow"
-          Sid    = ""
-          Principal = {
-            Service : [
-              "lambda.amazonaws.com",
-            ]
-          }
-        }
-      ]
-  })
-
-  lifecycle {
-    ignore_changes = all
-    create_before_destroy = true
-  }
-}
+# # Creating "lambda_role" role
+# resource "aws_iam_role" "lambda_role" {
+#   name = "lambda-role"
+#   assume_role_policy = jsonencode(
+#     {
+#       Version = "2012-10-17"
+#       Statement = [
+#         {
+#           Action = "sts:AssumeRole"
+#           Effect = "Allow"
+#           Sid    = ""
+#           Principal = {
+#             Service : [
+#               "lambda.amazonaws.com",
+#             ]
+#           }
+#         }
+#       ]
+#   })
+# 
+#   lifecycle {
+#     ignore_changes = all
+#     create_before_destroy = true
+#   }
+# }
 
 
 # ✅ API Gateway
