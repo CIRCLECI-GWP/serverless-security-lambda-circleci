@@ -28,7 +28,7 @@ jobs:
           command: |
             cd src/lambda
             npm ci
-            npm install --production
+            npm install express
       - persist_to_workspace:
           root: ~/
           paths:
