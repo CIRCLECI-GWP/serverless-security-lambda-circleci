@@ -99,18 +99,6 @@ resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
 
 
 
-# # ✅ Attach Policy to Role
-# resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
-#   policy_arn = aws_iam_policy.dynamodb_policy.arn
-#   role       = aws_iam_role.lambda_role.name
-# }
-# 
-# # ✅ Attach Policy to Role
-# resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
-#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-#   role       = aws_iam_role.lambda_role.name
-# }
-
 # Creating zip file
 data "archive_file" "application-code" {
   type        = "zip"
@@ -136,80 +124,6 @@ resource "aws_lambda_function" "real_estate_lambda" {
     }
   }
 }
-
-# # Creating "lambda_role" role
-# resource "aws_iam_role" "lambda_role" {
-#   name = "lambda-role"
-#   assume_role_policy = jsonencode(
-#     {
-#       Version = "2012-10-17"
-#       Statement = [
-#         {
-#           Action = "sts:AssumeRole"
-#           Effect = "Allow"
-#           Sid    = ""
-#           Principal = {
-#             Service : [
-#               "lambda.amazonaws.com",
-#             ]
-#           }
-#         }
-#       ]
-#   })
-# 
-#   lifecycle {
-#     ignore_changes = all
-#     create_before_destroy = true
-#   }
-# }
-
-
-# ✅ API Gateway
-# resource "aws_api_gateway_rest_api" "real_estate_api" {
-#   name        = "real_state_api"
-#   description = "API Gateway for Real Estate Lambda"
-# }
-# 
-# resource "aws_api_gateway_resource" "real_estate_resource" {
-#   rest_api_id = aws_api_gateway_rest_api.real_estate_api.id
-#   parent_id   = aws_api_gateway_rest_api.real_estate_api.root_resource_id
-#   path_part   = "property"
-# }
-# 
-# resource "aws_api_gateway_method" "real_estate_method" {
-#   rest_api_id   = aws_api_gateway_rest_api.real_estate_api.id
-#   resource_id   = aws_api_gateway_resource.real_estate_resource.id
-#   http_method   = "ANY"
-#   authorization = "NONE"
-# }
-# 
-# resource "aws_api_gateway_integration" "real_estate_integration" {
-#   rest_api_id             = aws_api_gateway_rest_api.real_estate_api.id
-#   resource_id             = aws_api_gateway_resource.real_estate_resource.id
-#   http_method             = aws_api_gateway_method.real_estate_method.http_method
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.real_estate_lambda.invoke_arn
-# }
-# 
-# # ✅ Deploy API Gateway
-# resource "aws_api_gateway_deployment" "real_estate_deployment" {
-#   depends_on = [
-#     aws_api_gateway_integration.real_estate_integration
-#   ]
-#   rest_api_id = aws_api_gateway_rest_api.real_estate_api.id
-#   triggers = {
-#     redeployment = sha1(jsonencode(aws_api_gateway_rest_api.real_estate_api))
-#   }
-# }
-# 
-# resource "aws_lambda_permission" "api_gateway_permission" {
-#   statement_id  = "AllowExecutionFromAPIGateway"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.real_estate_lambda.function_name
-#   principal     = "apigateway.amazonaws.com"
-# }
-
 
 
 
@@ -246,75 +160,3 @@ resource "aws_iam_role" "lambda_exec" {
 	  ]
 	})
 }
-
-# resource "aws_api_gateway_rest_api" "real_estate_lambda" {
-#   name        = "ServerlessRealStateLambda"
-#   description = "Terraform Serverless Application RealStateLambda"
-# }
-# 
-# resource "aws_api_gateway_resource" "proxy" {
-#   rest_api_id = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   parent_id   = "${aws_api_gateway_rest_api.real_estate_lambda.root_resource_id}"
-#   path_part   = "{proxy+}"
-# }
-# 
-# resource "aws_api_gateway_method" "proxy" {
-#   rest_api_id   = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   resource_id   = "${aws_api_gateway_resource.proxy.id}"
-#   http_method   = "ANY"
-#   authorization = "NONE"
-# }
-# 
-# resource "aws_api_gateway_integration" "lambda" {
-#   rest_api_id = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   resource_id = "${aws_api_gateway_method.proxy.resource_id}"
-#   http_method = "${aws_api_gateway_method.proxy.http_method}"
-# 
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = "${aws_lambda_function.real_estate_lambda.invoke_arn}"
-# }
-# 
-# resource "aws_api_gateway_method" "proxy_root" {
-#   rest_api_id   = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   resource_id   = "${aws_api_gateway_rest_api.real_estate_lambda.root_resource_id}"
-#   http_method   = "ANY"
-#   authorization = "NONE"
-# }
-# 
-# resource "aws_api_gateway_integration" "lambda_root" {
-#   rest_api_id = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   resource_id = "${aws_api_gateway_method.proxy_root.resource_id}"
-#   http_method = "${aws_api_gateway_method.proxy_root.http_method}"
-# 
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = "${aws_lambda_function.real_estate_lambda.invoke_arn}"
-# }
-# 
-# resource "aws_api_gateway_deployment" "real_estate_lambda" {
-#   depends_on = [
-#     "aws_api_gateway_integration.lambda",
-#     "aws_api_gateway_integration.lambda_root",
-#   ]
-# 
-#   rest_api_id = "${aws_api_gateway_rest_api.real_estate_lambda.id}"
-#   stage_name  = "test"
-# }
-# 
-# resource "aws_lambda_permission" "apigw" {
-#   statement_id  = "AllowAPIGatewayInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = "${aws_lambda_function.real_estate_lambda.function_name}"
-#   principal     = "apigateway.amazonaws.com"
-# 
-#   # The /*/* portion grants access from any method on any resource
-#   # within the API Gateway "REST API".
-#   source_arn = "${aws_api_gateway_rest_api.real_estate_lambda.execution_arn}/*/*"
-# }
-# 
-# # ✅ Output API Gateway URL
-# output "api_url" {
-#   value = aws_api_gateway_deployment.real_estate_deployment.invoke_url
-# }
-# 
