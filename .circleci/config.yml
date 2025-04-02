@@ -34,11 +34,14 @@ jobs:
             echo "ls -l node_modules"
             ls -l node_modules
       - persist_to_workspace:
-          root: ~/
           paths:
-            - .
+            - "."
+          root: "~"
 
   plan_infrastructure:
+    docker:
+      - image: cimg/node:21.4.0  
+    working_directory: ./
     executor: terraform/default
     parameters:
       env:
@@ -63,6 +66,7 @@ jobs:
       - run:
           command: |
             cd src/lambda
+            npm install
             echo "ls -lR"
             ls -lR
       - persist_to_workspace:
