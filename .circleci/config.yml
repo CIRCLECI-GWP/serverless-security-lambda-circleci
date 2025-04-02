@@ -27,8 +27,8 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            echo "ls -l node_modules"
-            ls -l node_modules
+            echo "ls -lR"
+            ls -lR
             npm install
             echo "ls -l node_modules"
             ls -l node_modules
@@ -62,8 +62,8 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            echo "ls"
-            ls
+            echo "ls -lR"
+            ls -lR
       - persist_to_workspace:
           paths:
             - "."
