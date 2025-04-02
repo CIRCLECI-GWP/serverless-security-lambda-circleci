@@ -33,15 +33,15 @@ jobs:
             npm install
             echo "ls -l node_modules"
             ls -l node_modules
+      - save_cache:
+          key: node-modules-1329
+          paths:
+            - src/lambda/node_modules
+          when: always
       - persist_to_workspace:
           paths:
             - "."
           root: "~"
-      - save_cache:
-          key: node-modules-1326
-          paths:
-            - src/lambda/node_modules
-          when: always
 
   plan_infrastructure:
     executor: terraform/default
@@ -54,7 +54,7 @@ jobs:
       - attach_workspace:
           at: "./"
       - restore_cache:
-          key: node-modules-1326
+          key: node-modules-1329
       - run:
           command: |
             cd src/lambda
