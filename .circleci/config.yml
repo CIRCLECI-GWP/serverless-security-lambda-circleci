@@ -34,9 +34,9 @@ jobs:
             echo "ls -l node_modules"
             ls -l node_modules
       - save_cache:
-          key: node-modules-1329
+          key: node-modules-1332
           paths:
-            - src/lambda/node_modules
+            - src/lambda
           when: always
       - persist_to_workspace:
           paths:
@@ -54,7 +54,7 @@ jobs:
       - attach_workspace:
           at: "./"
       - restore_cache:
-          key: node-modules-1329
+          key: node-modules-1332
       - run:
           command: |
             cd src/lambda
