@@ -37,6 +37,11 @@ jobs:
           paths:
             - "."
           root: "~"
+      - save_cache:
+          key: node-modules-1326
+          paths:
+            - src/lambda/node_modules
+          when: always
 
   plan_infrastructure:
     executor: terraform/default
@@ -49,7 +54,7 @@ jobs:
       - attach_workspace:
           at: "./"
       - restore_cache:
-          key: node-modules-<< checksum "src/lambda/package.json" >>
+          key: node-modules-1326
       - run:
           command: |
             cd src/lambda
@@ -76,12 +81,6 @@ jobs:
           paths:
             - "."
           root: "~"
-      - save_cache:
-          key: node-modules-<< checksum "src/lambda/package.json" >>
-          paths:
-            - src/lambda/node_modules
-          when: always
-
 
   apply_infrastructure:
     executor: terraform/default
