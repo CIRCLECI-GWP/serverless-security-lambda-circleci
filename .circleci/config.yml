@@ -38,9 +38,9 @@ jobs:
             - "."
           root: "~"
       - save_cache:
-          key: node-modules-1337
+          key: node-modules-1342
           paths:
-            - src/lambda
+            - .
           when: always
 
   plan_infrastructure:
@@ -54,7 +54,7 @@ jobs:
       - attach_workspace:
           at: "./"
       - restore_cache:
-          key: node-modules-1337
+          key: node-modules-1342
       - run:
           command: |
             cd src/lambda
