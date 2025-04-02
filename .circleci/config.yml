@@ -62,6 +62,7 @@ jobs:
       - run:
           command: |
             cd src/lambda
+            npm install
             echo "ls -lR"
             ls -lR
       - persist_to_workspace:
