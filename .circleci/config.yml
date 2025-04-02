@@ -48,6 +48,8 @@ jobs:
     steps:
       - attach_workspace:
           at: "./"
+      - restore_cache:
+          key: node-modules-<< checksum "src/lambda/package.json" >>
       - run:
           command: |
             cd src/lambda
@@ -74,6 +76,12 @@ jobs:
           paths:
             - "."
           root: "~"
+      - save_cache:
+          key: node-modules-<< checksum "src/lambda/package.json" >>
+          paths:
+            - src/lambda/node_modules
+          when: always
+
 
   apply_infrastructure:
     executor: terraform/default
