@@ -29,7 +29,6 @@ jobs:
             cd src/lambda
             # npm ci
             npm install
-            npm run build
             echo "ls -l node_modules"
             ls -l node_modules
       - persist_to_workspace:
