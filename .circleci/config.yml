@@ -28,6 +28,8 @@ jobs:
           command: |
             cd src/lambda
             # npm ci
+            echo "ls -l node_modules"
+            ls -l node_modules
             npm install
             echo "ls -l node_modules"
             ls -l node_modules
@@ -58,6 +60,12 @@ jobs:
           var: |
             terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
             terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+      - run:
+          command: |
+            cd src/lambda
+            # npm ci
+            echo "ls"
+            ls
       - persist_to_workspace:
           paths:
             - "."
