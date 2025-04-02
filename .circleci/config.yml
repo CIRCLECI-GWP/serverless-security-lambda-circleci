@@ -20,8 +20,7 @@ jobs:
   build_lambdas:
     docker:
       - image: cimg/node:21.4.0
-    # working_directory: ~/project
-    working_directory: ./
+    working_directory: ~/project
     steps:
       - attach_workspace:
           at: ./
@@ -38,9 +37,9 @@ jobs:
             - "."
           root: "~"
       - save_cache:
-          key: node-modules-1342
+          key: node-modules-1346
           paths:
-            - .
+            - ~/project/src
           when: always
 
   plan_infrastructure:
@@ -54,7 +53,7 @@ jobs:
       - attach_workspace:
           at: "./"
       - restore_cache:
-          key: node-modules-1342
+          key: node-modules-1346
       - run:
           command: |
             cd src/lambda
