@@ -20,7 +20,8 @@ jobs:
   build_lambdas:
     docker:
       - image: cimg/node:21.4.0
-    working_directory: ~/project
+    # working_directory: ~/project
+    working_directory: ./
     steps:
       - attach_workspace:
           at: ./
@@ -62,7 +63,6 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            npm install
             echo "ls -lR"
             ls -lR
       - persist_to_workspace:
