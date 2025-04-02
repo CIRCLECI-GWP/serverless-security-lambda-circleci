@@ -39,9 +39,6 @@ jobs:
           root: "~"
 
   plan_infrastructure:
-    docker:
-      - image: cimg/node:21.4.0  
-    working_directory: ./
     executor: terraform/default
     parameters:
       env:
@@ -51,6 +48,11 @@ jobs:
     steps:
       - attach_workspace:
           at: "./"
+      - run:
+          command: |
+            cd src/lambda
+            echo "ls -lR ANTES"
+            ls -lR          
       - run: echo "Executing terraform init"      
       - terraform/init:
           path: infrastructure/environments/<< parameters.env >>
@@ -66,8 +68,7 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            npm install
-            echo "ls -lR"
+            echo "ls -lR DEPOIS"
             ls -lR
       - persist_to_workspace:
           paths:
