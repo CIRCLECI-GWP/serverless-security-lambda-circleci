@@ -36,16 +36,11 @@ jobs:
           paths:
             - "."
           root: "~"
-      - save_cache:
-          key: node-modules-1346
-          paths:
-            - ~/project/src
-          when: always
-      - run: mkdir -p workspace && echo "Hello, workspace!" > workspace/message.txt
+      # - run: mkdir -p workspace && echo "Hello, workspace!" > workspace/message.txt
       - persist_to_workspace:
-          root: workspace
+          root: .
           paths:
-            - message.txt          
+            - src/lambda
 
   plan_infrastructure:
     executor: terraform/default
@@ -56,12 +51,10 @@ jobs:
         type: string
     steps:
       - attach_workspace:
-          at: /workspace
-      - run: cat /workspace/message.txt  # Verify that the file exists    
-      - attach_workspace:
           at: "./"
-      - restore_cache:
-          key: node-modules-1346
+      - attach_workspace:
+          at: /src/lambda
+      # - run: cat /workspace/message.txt  # Verify that the file exists    
       - run:
           command: |
             cd src/lambda
