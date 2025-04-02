@@ -23,7 +23,7 @@ jobs:
     working_directory: ~/project
     steps:
       - attach_workspace:
-          at: ./
+          at: ./      
       - run:
           command: |
             cd src/lambda
@@ -41,6 +41,11 @@ jobs:
           paths:
             - ~/project/src
           when: always
+      - run: mkdir -p workspace && echo "Hello, workspace!" > workspace/message.txt
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - message.txt          
 
   plan_infrastructure:
     executor: terraform/default
@@ -50,6 +55,9 @@ jobs:
       env_suffix:
         type: string
     steps:
+      - attach_workspace:
+          at: /workspace
+      - run: cat /workspace/message.txt  # Verify that the file exists    
       - attach_workspace:
           at: "./"
       - restore_cache:
