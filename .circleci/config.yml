@@ -27,16 +27,11 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            # echo "ls -lR"
-            # ls -lR
             npm install
-            # echo "ls -l node_modules"
-            # ls -l node_modules
       - persist_to_workspace:
           paths:
             - "."
           root: "~"
-      # - run: mkdir -p workspace && echo "Hello, workspace!" > workspace/message.txt
       - persist_to_workspace:
           root: .
           paths:
@@ -54,12 +49,6 @@ jobs:
           at: "./"
       - attach_workspace:
           at: /src/lambda
-      # - run: cat /workspace/message.txt  # Verify that the file exists    
-      #- run:
-      #    command: |
-      #      cd src/lambda
-      #      echo "ls -lR ANTES"
-      #      ls -lR          
       - run: echo "Executing terraform init"      
       - terraform/init:
           path: infrastructure/environments/<< parameters.env >>
@@ -75,8 +64,6 @@ jobs:
       - run:
           command: |
             cd src/lambda
-            # echo "ls -lR DEPOIS"
-            # ls -lR
       - persist_to_workspace:
           paths:
             - "."
