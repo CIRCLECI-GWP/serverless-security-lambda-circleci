@@ -161,25 +161,22 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-# ✅ IAM Policy for Secrets Manager Access
-resource "aws_iam_policy" "secretsmanager_policy" {
-  name        = "LambdaSecretsManagerPolicy"
-  description = "Policy for Lambda to access Secrets Manager"
+data "aws_iam_policy_document" "db_secret" {
+  statement {
+    sid    = "AllowPublicAccessToSecret"
+    effect = "Allow"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "secretsmanager:GetSecretValue"
-        Resource = aws_secretsmanager_secret.db_secret.arn
-      }
-    ]
-  })
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.db_secret.arn]
+  }
 }
 
-# ✅ Attach the new policy to the Lambda role
-resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_attach" {
-  policy_arn = aws_iam_policy.secretsmanager_policy.arn
-  role       = aws_iam_role.lambda_exec.name
+resource "aws_secretsmanager_secret_policy" "db_secret" {
+  secret_arn = aws_secretsmanager_secret.db_secret.arn
+  policy     = data.aws_iam_policy_document.db_secret.json
 }
