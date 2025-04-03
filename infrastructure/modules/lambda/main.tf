@@ -192,7 +192,7 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
         "Sid": "EnableAnotherAWSAccountToReadTheSecret",
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::123456789012:root"
+          "AWS": "arn:aws:iam::109718661763:root"
         },
         "Action": "secretsmanager:GetSecretValue",
         "Resource": "*"
