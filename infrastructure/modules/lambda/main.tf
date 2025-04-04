@@ -179,3 +179,5 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
     ]
   })
 }
+
+
