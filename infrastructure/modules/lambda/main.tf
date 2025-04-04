@@ -161,23 +161,21 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-# resource "aws_secretsmanager_secret_policy" "db_secret" {
-#   secret_arn = aws_secretsmanager_secret.db_secret.arn
-# 
-#   policy = jsonencode(
-# 
-#	{
-#     "Version": "2012-10-17",
-#     "Statement": [
-#       {
-#         "Sid": "EnableAnotherAWSAccountToReadTheSecret",
-#         "Effect": "Allow",
-#         "Principal": {
-#           "AWS": "arn:aws:iam::109718661763:root"
-#         },
-#         "Action": "secretsmanager:GetSecretValue",
-#         "Resource": "*"
-#       }
-#     ]
-#   })
-# }
+resource "aws_secretsmanager_secret_policy" "db_secret" {
+  secret_arn = aws_secretsmanager_secret.db_secret.arn
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "EnableAnotherAWSAccountToReadTheSecret",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::109718661763:root"
+        },
+        "Action": "secretsmanager:GetSecretValue",
+        "Resource": "*"
+      }
+    ]
+  })
+}
