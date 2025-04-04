@@ -166,20 +166,25 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
   secret_arn = aws_secretsmanager_secret.db_secret.arn
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version = "2012-10-17",
+    Statement = [
       {
-        "Sid": "AllowAllAccountsToAssumeRole",
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "arn:aws:sts::*:assumed-role/serverless_real_estate_lambda/real_state_api"
-        },
-        "Action": "secretsmanager:GetSecretValue",
-        "Resource": "aws_secretsmanager_secret.db_secret.arn"
+        Sid       = "AllowAssumedRoleAccess",
+        Effect    = "Allow",
+        Principal = "*",  # Allows any principal, but restricted by condition
+        Action    = "secretsmanager:GetSecretValue",
+        Resource  = aws_secretsmanager_secret.db_secret.arn,  # Correct Terraform reference
+
+        Condition = {
+          StringLike = {
+            "aws:PrincipalArn" = "arn:aws:sts::*:assumed-role/serverless_real_estate_lambda/real_state_api"
+          }
+        }
       }
     ]
   })
 }
+
 
 
 
