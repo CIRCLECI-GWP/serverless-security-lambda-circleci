@@ -161,6 +161,7 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
+
 resource "aws_secretsmanager_secret_policy" "db_secret" {
   secret_arn = aws_secretsmanager_secret.db_secret.arn
 
