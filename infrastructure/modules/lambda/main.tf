@@ -175,7 +175,7 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
           "AWS": "arn:aws:sts::*:assumed-role/serverless_real_estate_lambda/real_state_api"
         },
         "Action": "secretsmanager:GetSecretValue",
-        "Resource": [aws_secretsmanager_secret.db_secret.arn]
+        "Resource": "aws_secretsmanager_secret.db_secret.arn"
       }
     ]
   })
