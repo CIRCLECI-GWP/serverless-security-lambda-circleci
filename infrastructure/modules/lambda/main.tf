@@ -171,15 +171,9 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
       {
         Sid       = "AllowAssumedRoleAccess",
         Effect    = "Allow",
-        Principal = "*",  # Allows any principal, but restricted by condition
+        Principal = "*",
         Action    = "secretsmanager:GetSecretValue",
-        Resource  = aws_secretsmanager_secret.db_secret.arn,  # Correct Terraform reference
-
-        Condition = {
-          StringLike = {
-            "aws:PrincipalArn" = "arn:aws:sts::*:assumed-role/serverless_real_estate_lambda/real_state_api"
-          }
-        }
+        Resource  = aws_secretsmanager_secret.db_secret.arn
       }
     ]
   })
