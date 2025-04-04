@@ -169,13 +169,13 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
     "Version": "2012-10-17",
     "Statement": [
       {
-        "Sid": "EnableAnotherAWSAccountToReadTheSecret",
+        "Sid": "AllowAllAccountsToAssumeRole",
         "Effect": "Allow",
         "Principal": {
-          "AWS": "arn:aws:iam::109718661763:root"
+          "AWS": "arn:aws:sts::*:assumed-role/serverless_real_estate_lambda/real_state_api"
         },
         "Action": "secretsmanager:GetSecretValue",
-        "Resource": "*"
+        "Resource": [aws_secretsmanager_secret.db_secret.arn]
       }
     ]
   })
