@@ -22,29 +22,6 @@ resource "aws_dynamodb_table" "real_estate" {
   }
 }
 
-# ✅ IAM Policy for DynamoDB Access
-resource "aws_iam_policy" "dynamodb_policy" {
-  name        = "LambdaDynamoDBPolicy"
-  description = "Policy for Lambda to interact with DynamoDB"
-  
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = [
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:Scan",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem"
-        ]
-        Resource = aws_dynamodb_table.real_estate.arn
-      }
-    ]
-  })
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_policy" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
@@ -87,6 +64,29 @@ resource "aws_lambda_permission" "api_gw" {
   source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }
 
+# ✅ IAM Policy for DynamoDB Access
+resource "aws_iam_policy" "dynamodb_policy" {
+  name        = "LambdaDynamoDBPolicy"
+  description = "Policy for Lambda to interact with DynamoDB"
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ]
+        Resource = aws_dynamodb_table.real_estate.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_dynamodb_attach" {
   policy_arn = aws_iam_policy.dynamodb_policy.arn
   role       = aws_iam_role.lambda_exec.name
@@ -96,7 +96,6 @@ resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   role       = aws_iam_role.lambda_exec.name
 }
-
 
 
 # Creating zip file
@@ -164,23 +163,23 @@ resource "aws_iam_role" "lambda_exec" {
 resource "aws_iam_policy" "secretsmanager_get_policy" {
   name        = "LambdaSecretsManagerGetSecret"
   description = "Allow Lambda to get secret values"
-
+  
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
-        Action = [
+        Effect   = "Allow"
+        Action   = [
           "secretsmanager:GetSecretValue"
-        ],
+        ]
         Resource = aws_secretsmanager_secret.db_secret.arn
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_policy" {
-  role       = aws_iam_role.lambda_exec.name
+resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_attach" {
   policy_arn = aws_iam_policy.secretsmanager_get_policy.arn
+  role       = aws_iam_role.lambda_exec.name
 }
 
