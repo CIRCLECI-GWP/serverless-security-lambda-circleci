@@ -42,6 +42,8 @@ jobs:
       - image: cimg/node:21.4.0
     steps:
       - attach_workspace:
+          at: "./"
+      - attach_workspace:
           at: /src/lambda
       - run: |
           cd src/lambda
