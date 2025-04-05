@@ -29,7 +29,12 @@ jobs:
             cd src/lambda
             npm install
             npm audit
-            npx snyk test || true
+      - snyk/scan:
+          fail-on-issues: false
+          monitor-on-build: true
+          # project: ${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-app
+          severity-threshold: high
+          token-variable: $SNYK_API_TOKEN
       - persist_to_workspace:
           paths:
             - "."
