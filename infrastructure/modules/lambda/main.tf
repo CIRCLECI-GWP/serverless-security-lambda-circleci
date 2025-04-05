@@ -124,6 +124,11 @@ resource "aws_lambda_function" "real_estate_lambda" {
   }
 }
 
+resource "aws_lambda_function_url" "real_estate_lambda_url" {
+  function_name      = aws_lambda_function.real_estate_lambda.function_name
+  authorization_type = "AWS_IAM"
+}
+
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "lambda_exec" {
