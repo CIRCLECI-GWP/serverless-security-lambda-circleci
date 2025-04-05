@@ -11,6 +11,7 @@ const {
 } = require("@aws-sdk/lib-dynamodb");
 const dotenv = require("dotenv");
 const serverless = require("serverless-http");
+const xss = require("xss");
 
 // Load environment variables
 dotenv.config();
@@ -36,15 +37,28 @@ function validateProperty(data) {
     return null;
 }
 
+function sanitizeInput(data) {
+    return {
+        PropertyID: xss(data.PropertyID),
+        Title: xss(data.Title),
+        Description: xss(data.Description),
+        PropertyType: xss(data.PropertyType),
+        Price: data.Price, // assume numeric
+        PropertyLocation: xss(data.PropertyLocation)
+    };
+}
+
 // ✅ Create a new property
 app.post("/property", async (req, res) => {
     const error = validateProperty(req.body);
     if (error) return res.status(400).json({ error });
 
+    const sanitized = sanitizeInput(req.body);
+
     try {
         const params = new PutCommand({
             TableName: TABLE_NAME,
-            Item: req.body,
+            Item: sanitized,
             ConditionExpression: "attribute_not_exists(PropertyID)", // Prevent overwriting existing data
         });
 
@@ -74,8 +88,10 @@ app.get("/property/:id", async (req, res) => {
 
 // ✅ Update a property
 app.put("/property/:id", async (req, res) => {
-    const { Title, Description, PropertyType, Price, PropertyLocation } = req.body;
+    const sanitized = sanitizeInput(req.body);
+    const { Title, Description, PropertyType, Price, PropertyLocation } = sanitized;
     if (!Title && !Description && !PropertyType && !Price && !PropertyLocation) return res.status(400).json({ error: "No fields to update" });
+
 
     try {
         const params = new UpdateCommand({
