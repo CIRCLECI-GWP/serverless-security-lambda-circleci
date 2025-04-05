@@ -124,21 +124,6 @@ resource "aws_lambda_function" "real_estate_lambda" {
   }
 }
 
-
-
-
-
-resource "aws_secretsmanager_secret" "db_secret" {
-  name = "DBSecret6"
-}
-
-resource "aws_secretsmanager_secret_version" "db_secret_value" {
-  secret_id     = aws_secretsmanager_secret.db_secret.id
-  secret_string = jsonencode({
-    tableName = "RealEstateListings"
-  })
-}
-
 # IAM role which dictates what other AWS services the Lambda function
 # may access.
 resource "aws_iam_role" "lambda_exec" {
@@ -160,26 +145,35 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-resource "aws_iam_policy" "secretsmanager_get_policy" {
-  name        = "LambdaSecretsManagerGetSecret"
-  description = "Allow Lambda to get secret values"
-  
+resource "aws_secretsmanager_secret" "db_secret" {
+  name = "DBSecret6"
+}
+
+resource "aws_secretsmanager_secret_version" "db_secret_value" {
+  secret_id     = aws_secretsmanager_secret.db_secret.id
+  secret_string = jsonencode({
+    tableName = "RealEstateListings"
+  })
+}
+
+# Get current account ID
+data "aws_caller_identity" "current" {}
+
+resource "aws_secretsmanager_secret_policy" "db_secret_policy" {
+  secret_arn = aws_secretsmanager_secret.db_secret.arn
+
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
-          "secretsmanager:GetSecretValue"
-        ]
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/serverless_real_estate_lambda"
+        },
+        Action = "secretsmanager:GetSecretValue",
         Resource = aws_secretsmanager_secret.db_secret.arn
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_secretsmanager_attach" {
-  policy_arn = aws_iam_policy.secretsmanager_get_policy.arn
-  role       = aws_iam_role.lambda_exec.name
 }
 
