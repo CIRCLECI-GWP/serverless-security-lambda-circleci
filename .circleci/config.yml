@@ -39,11 +39,6 @@ jobs:
 
   plan_infrastructure:
     executor: terraform/default
-    parameters:
-      env:
-        type: string
-      env_suffix:
-        type: string
     steps:
       - attach_workspace:
           at: "./"
@@ -51,16 +46,16 @@ jobs:
           at: /src/lambda
       - run: echo "Executing terraform init"      
       - terraform/init:
-          path: infrastructure/environments/<< parameters.env >>
+          path: infrastructure
           backend_config: |
-            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
-            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+            access_key=$AWS_ACCESS_KEY_ID,
+            secret_key=$AWS_SECRET_ACCESS_KEY
       - run: echo "Executing terraform plan"
       - terraform/plan:
-          path: infrastructure/environments/<< parameters.env >>
+          path: infrastructure
           var: |
-            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
-            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+            terraform_aws_access_key=$AWS_ACCESS_KEY_ID
+            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY
       - run:
           command: |
             cd src/lambda
@@ -71,23 +66,18 @@ jobs:
 
   apply_infrastructure:
     executor: terraform/default
-    parameters:
-      env:
-        type: string
-      env_suffix:
-        type: string
     steps:
       - attach_workspace:
           at: "./"
       - run: echo "Executing terraform apply"
       - terraform/apply:
-          path: infrastructure/environments/<< parameters.env >>
+          path: infrastructure
           backend_config: |
-            access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>,
-            secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+            access_key=$AWS_ACCESS_KEY_ID,
+            secret_key=$AWS_SECRET_ACCESS_KEY
           var: |
-            terraform_aws_access_key=$AWS_ACCESS_KEY_ID<< parameters.env_suffix >>
-            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY<< parameters.env_suffix >>
+            terraform_aws_access_key=$AWS_ACCESS_KEY_ID
+            terraform_aws_secret_key=$AWS_SECRET_ACCESS_KEY
       - persist_to_workspace:
           paths:
             - "."
@@ -103,13 +93,9 @@ workflows:
             - project_checkout
       - plan_infrastructure:
           name: plan_infrastructure
-          env:  "sandbox"
-          env_suffix: "_SANDBOX"
           requires:
             - build_lambdas
       - apply_infrastructure:
           name: apply_infrastructure
-          env:  "sandbox"
-          env_suffix: "_SANDBOX"
           requires:
             - plan_infrastructure
