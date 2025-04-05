@@ -168,7 +168,7 @@ data "aws_iam_policy_document" "db_secret" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:sts::109718661763:assumed-role/serverless_real_estate_lambda/real_state_api"]
+      identifiers = ["arn:aws:iam::109718661763:root"]
     }
 
     actions   = ["secretsmanager:GetSecretValue"]
