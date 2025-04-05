@@ -33,7 +33,7 @@ if ($policyArn) {
 }
 
 # Delete Secrets Manager Secret
-$secretName = "DBSecret6"
+$secretName = "DBSecret7"
 $secretId = aws secretsmanager list-secrets --query "SecretList[?Name=='$secretName'].ARN" --output text
 if ($secretId) {
     aws secretsmanager delete-secret --secret-id $secretId --force-delete-without-recovery

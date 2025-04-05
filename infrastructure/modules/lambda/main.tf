@@ -146,7 +146,7 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 resource "aws_secretsmanager_secret" "db_secret" {
-  name = "DBSecret6"
+  name = "DBSecret7"
 }
 
 resource "aws_secretsmanager_secret_version" "db_secret_value" {
