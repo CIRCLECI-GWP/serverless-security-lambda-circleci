@@ -35,7 +35,7 @@ jobs:
           monitor-on-build: true
           # project: ${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}-app
           severity-threshold: high
-          token-variable: $SNYK_API_TOKEN
+          token-variable: SNYK_API_TOKEN
       - persist_to_workspace:
           paths:
             - "."
