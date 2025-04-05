@@ -9,7 +9,6 @@ const {
     DeleteCommand, 
     ScanCommand 
 } = require("@aws-sdk/lib-dynamodb");
-const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 const dotenv = require("dotenv");
 const serverless = require("serverless-http");
 
@@ -21,29 +20,10 @@ app.use(express.json());
 app.use(helmet()); // Security headers
 
 // AWS Clients
-const secretsClient = new SecretsManagerClient({ region: process.env.AWS_REGION });
 const dbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
 let TABLE_NAME = "RealEstateListings";
-let DB_SECRET_NAME = process.env.DB_SECRET_NAME;
-
-// Retrieve secret (DynamoDB table name) securely
-async function getDBSecret() {
-    try {
-        const data = await secretsClient.send(new GetSecretValueCommand({ SecretId: DB_SECRET_NAME }));
-        const secret = JSON.parse(data.SecretString);
-        TABLE_NAME = secret.tableName; // Example secret format: { "tableName": "RealEstateListings" }
-    } catch (error) {
-        console.error("Error fetching secret:", error);
-        process.exit(1);
-    }
-}
-
-//await getDBSecret(); // Fetch secret before API starts
-(async () => {
-    await getDBSecret();
-})();
 
 // Input validation helper
 function validateProperty(data) {
