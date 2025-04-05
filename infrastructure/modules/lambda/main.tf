@@ -161,23 +161,6 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-resource "aws_secretsmanager_secret_policy" "db_secret" {
-  secret_arn = aws_secretsmanager_secret.db_secret.arn
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "AllowAssumedRoleAccess",
-        Effect    = "Allow",
-        Principal = "*",
-        Action    = "secretsmanager:GetSecretValue",
-        Resource  = aws_secretsmanager_secret.db_secret.arn
-      }
-    ]
-  })
-}
-
 data "aws_iam_policy_document" "db_secret" {
   statement {
     sid    = "EnableAnotherAWSAccountToReadTheSecret"
