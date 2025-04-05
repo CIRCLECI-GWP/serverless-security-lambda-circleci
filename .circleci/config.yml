@@ -28,28 +28,12 @@ jobs:
           command: |
             cd src/lambda
             npm install
+            npm audit
+            npx snyk test || true
       - persist_to_workspace:
           paths:
             - "."
           root: "~"
-      - persist_to_workspace:
-          root: .
-          paths:
-            - src/lambda
-
-  security_scan:
-    docker:
-      - image: cimg/node:21.4.0
-    working_directory: ~/project      
-    steps:
-      - attach_workspace:
-          at: "./"
-      - attach_workspace:
-          at: /src/lambda
-      - run: |
-          cd src/lambda
-          npm audit
-          npx snyk test || true
       - persist_to_workspace:
           root: .
           paths:
@@ -109,14 +93,10 @@ workflows:
           name: build_lambdas
           requires: 
             - project_checkout
-      - security_scan:
-          name: security_scan
-          requires:
-            - build_lambdas
       - plan_infrastructure:
           name: plan_infrastructure
           requires:
-            - security_scan
+            - build_lambdas
       - apply_infrastructure:
           name: apply_infrastructure
           requires:
