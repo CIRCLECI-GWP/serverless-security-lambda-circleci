@@ -106,10 +106,14 @@ workflows:
           name: build_lambdas
           requires: 
             - project_checkout
+      - security_scan:
+          name: security_scan
+          requires:
+            - build_lambdas
       - plan_infrastructure:
           name: plan_infrastructure
           requires:
-            - build_lambdas
+            - security_scan
       - apply_infrastructure:
           name: apply_infrastructure
           requires:
