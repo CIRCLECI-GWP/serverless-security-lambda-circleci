@@ -48,9 +48,10 @@ jobs:
     steps:
       - attach_workspace:
           at: ./
-      - attach_workspace:
-          at: /src/lambda     
-      - run: cd src/lambda
+      - run:
+          command: |
+            cd src/lambda
+            npm install
       - snyk/scan:
           token-variable: SNYK_API_TOKEN
           target-file: src/lambda/package.json
