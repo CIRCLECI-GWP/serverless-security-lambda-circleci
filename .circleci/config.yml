@@ -29,9 +29,9 @@ jobs:
           command: |
             cd src/lambda
             npm install
-      - snyk/scan:
-          token-variable: SNYK_API_TOKEN
-          target-file: src/lambda/package.json
+      # - snyk/scan:
+      #     token-variable: SNYK_API_TOKEN
+      #     target-file: src/lambda/package.json
       - persist_to_workspace:
           paths:
             - "."
@@ -40,6 +40,18 @@ jobs:
           root: .
           paths:
             - src/lambda
+
+  security_scan:
+    docker:
+      - image: cimg/node:21.4.0
+    steps:
+      - attach_workspace:
+          at: ./
+      - attach_workspace:
+          at: /src/lambda
+      - snyk/scan:
+          token-variable: SNYK_API_TOKEN
+          target-file: src/lambda/package.json
 
   plan_infrastructure:
     executor: terraform/default
@@ -95,6 +107,10 @@ workflows:
           name: build_lambdas
           requires: 
             - project_checkout
+      - security_scan:
+          name: security_scan
+          requires: 
+            - build_lambdas
       - plan_infrastructure:
           name: plan_infrastructure
           requires:
