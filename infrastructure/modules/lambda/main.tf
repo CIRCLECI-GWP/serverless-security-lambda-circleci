@@ -174,7 +174,7 @@ data "aws_iam_policy_document" "db_secret" {
 
     principals {
       type        = "AWS"
-      identifiers = [lambda_assumed_role_arn]
+      identifiers = [local.lambda_assumed_role_arn]
     }
 
     actions   = ["secretsmanager:GetSecretValue"]
