@@ -161,7 +161,6 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-
 resource "aws_secretsmanager_secret_policy" "db_secret" {
   secret_arn = aws_secretsmanager_secret.db_secret.arn
 
@@ -179,7 +178,23 @@ resource "aws_secretsmanager_secret_policy" "db_secret" {
   })
 }
 
+data "aws_iam_policy_document" "db_secret" {
+  statement {
+    sid    = "EnableAnotherAWSAccountToReadTheSecret"
+    effect = "Allow"
 
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::109718661763:root",
+        "arn:aws:sts::109718661763:assumed-role/serverless_real_estate_lambda/real_state_api"]
+    }
 
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = ["*"]
+  }
+}
 
-
+resource "aws_secretsmanager_secret_policy" "db_secret" {
+  secret_arn = aws_secretsmanager_secret.db_secret.arn
+  policy     = data.aws_iam_policy_document.db_secret.json
+}
