@@ -25,19 +25,25 @@ const secretsClient = new SecretsManagerClient({ region: process.env.AWS_REGION 
 const dbClient = new DynamoDBClient({ region: process.env.AWS_REGION });
 const docClient = DynamoDBDocumentClient.from(dbClient);
 
-const dbSecretName = process.env.DB_SECRET_NAME;
+let TABLE_NAME = "RealEstateListings";
+let DB_SECRET_NAME = process.env.DB_SECRET_NAME;
 
 // Retrieve secret (DynamoDB table name) securely
-async function getTableName() {
+async function getDBSecret() {
     try {
-        const data = await secretsClient.send(new GetSecretValueCommand({ SecretId: dbSecretName }));
+        const data = await secretsClient.send(new GetSecretValueCommand({ SecretId: DB_SECRET_NAME }));
         const secret = JSON.parse(data.SecretString);
-        return secret.tableName;
+        TABLE_NAME = secret.tableName; // Example secret format: { "tableName": "RealEstateListings" }
     } catch (error) {
         console.error("Error fetching secret:", error);
         process.exit(1);
     }
 }
+
+//await getDBSecret(); // Fetch secret before API starts
+(async () => {
+    await getDBSecret();
+})();
 
 // Input validation helper
 function validateProperty(data) {
@@ -56,9 +62,8 @@ app.post("/property", async (req, res) => {
     if (error) return res.status(400).json({ error });
 
     try {
-        const tableName = await getTableName();
         const params = new PutCommand({
-            TableName: tableName,
+            TableName: TABLE_NAME,
             Item: req.body,
             ConditionExpression: "attribute_not_exists(PropertyID)", // Prevent overwriting existing data
         });
@@ -73,9 +78,8 @@ app.post("/property", async (req, res) => {
 // ✅ Get a property by ID
 app.get("/property/:id", async (req, res) => {
     try {
-        const tableName = await getTableName();
         const params = new GetCommand({
-            TableName: tableName,
+            TableName: TABLE_NAME,
             Key: { PropertyID: req.params.id },
         });
 
@@ -94,9 +98,8 @@ app.put("/property/:id", async (req, res) => {
     if (!Title && !Description && !PropertyType && !Price && !PropertyLocation) return res.status(400).json({ error: "No fields to update" });
 
     try {
-        const tableName = await getTableName();
         const params = new UpdateCommand({
-            TableName: tableName,
+            TableName: TABLE_NAME,
             Key: { PropertyID: req.params.id },
             UpdateExpression: "SET Title = :t, Description = :d, PropertyType = :ty, Price = :p, PropertyLocation = :l",
             ExpressionAttributeValues: {
@@ -119,9 +122,8 @@ app.put("/property/:id", async (req, res) => {
 // ✅ Delete a property
 app.delete("/property/:id", async (req, res) => {
     try {
-        const tableName = await getTableName();
         const params = new DeleteCommand({
-            TableName: tableName,
+            TableName: TABLE_NAME,
             Key: { PropertyID: req.params.id },
             ConditionExpression: "attribute_exists(PropertyID)", // Prevent deletion of non-existing property
         });
@@ -136,9 +138,8 @@ app.delete("/property/:id", async (req, res) => {
 // ✅ Get all properties (Paginated)
 app.get("/properties", async (req, res) => {
     try {
-        const tableName = await getTableName();
         const params = new ScanCommand({
-            TableName: tableName,
+            TableName: TABLE_NAME,
             Limit: 10, // Adjust pagination as needed
         });
 
