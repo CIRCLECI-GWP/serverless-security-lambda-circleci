@@ -48,7 +48,8 @@ jobs:
       - attach_workspace:
           at: ./
       - attach_workspace:
-          at: /src/lambda
+          at: /src/lambda     
+      - run: cd src/lambda
       - snyk/scan:
           token-variable: SNYK_API_TOKEN
           target-file: src/lambda/package.json
@@ -114,7 +115,7 @@ workflows:
       - plan_infrastructure:
           name: plan_infrastructure
           requires:
-            - build_lambdas
+            - security_scan
       - apply_infrastructure:
           name: apply_infrastructure
           requires:
