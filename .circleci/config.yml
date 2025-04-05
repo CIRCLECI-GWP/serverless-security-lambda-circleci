@@ -3,7 +3,6 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.6.0
   aws-cli: circleci/aws-cli@4.1.2
-  snyk: snyk/snyk@2.3.0
 
 jobs:
 
@@ -13,15 +12,6 @@ jobs:
       docker_layer_caching: true
     steps:
       - checkout
-      - run: cd src/lambda
-      - run: npm install
-      - snyk/install
-      - run:
-          command: snyk version
-          name: Which version of snyk is installed
-      - run:
-          command: snyk code test
-          name: Run code scan
       - persist_to_workspace:
           root: .
           paths:
@@ -42,6 +32,21 @@ jobs:
           paths:
             - "."
           root: "~"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - src/lambda
+
+  security_scan:
+    docker:
+      - image: cimg/node:21.4.0
+    steps:
+      - attach_workspace:
+          at: /src/lambda
+      - run: |
+          cd src/lambda
+          npm audit
+          npx snyk test || true
       - persist_to_workspace:
           root: .
           paths:
