@@ -23,7 +23,7 @@ provider "aws" {
 
 #Call module lambda Terraform
 module "lambda" {
-  source                   = "../../modules/lambda"
+  source                   = ".//lambda"
   terraform_aws_access_key = var.terraform_aws_access_key
   terraform_aws_secret_key = var.terraform_aws_secret_key
 }
