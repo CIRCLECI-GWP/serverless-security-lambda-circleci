@@ -59,8 +59,8 @@ jobs:
   plan_infrastructure:
     executor: terraform/default
     steps:
-      # - attach_workspace:
-      #     at: "./"
+      - attach_workspace:
+          at: "./"
       - attach_workspace:
           at: /src/lambda
       - run: echo "Executing terraform init"      
