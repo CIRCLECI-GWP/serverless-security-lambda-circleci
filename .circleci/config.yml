@@ -49,9 +49,13 @@ jobs:
           command: |
             cd src/lambda
             npm install
+      - run: echo "Running npm audit"
+          npm audit --audit-level=low
+      - run: echo "Running Snyk scan"
       - snyk/scan:
           token-variable: SNYK_API_TOKEN
           target-file: src/lambda/package.json
+          severity-threshold: low
 
   plan_infrastructure:
     executor: terraform/default
