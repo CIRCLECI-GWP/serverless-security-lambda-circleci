@@ -23,8 +23,8 @@ jobs:
       - image: cimg/node:21.4.0
     working_directory: ~/project
     steps:
-      # - attach_workspace:
-      #     at: ./      
+      - attach_workspace:
+          at: ./
       - run:
           command: |
             cd src/lambda
