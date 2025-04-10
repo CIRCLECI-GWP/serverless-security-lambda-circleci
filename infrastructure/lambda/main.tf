@@ -150,35 +150,3 @@ resource "aws_iam_role" "lambda_exec" {
 	})
 }
 
-resource "aws_secretsmanager_secret" "db_secret" {
-  name = "DBSecret7"
-}
-
-resource "aws_secretsmanager_secret_version" "db_secret_value" {
-  secret_id     = aws_secretsmanager_secret.db_secret.id
-  secret_string = jsonencode({
-    tableName = "RealEstateListings"
-  })
-}
-
-# Get current account ID
-data "aws_caller_identity" "current" {}
-
-resource "aws_secretsmanager_secret_policy" "db_secret_policy" {
-  secret_arn = aws_secretsmanager_secret.db_secret.arn
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/serverless_real_estate_lambda"
-        },
-        Action = "secretsmanager:GetSecretValue",
-        Resource = aws_secretsmanager_secret.db_secret.arn
-      }
-    ]
-  })
-}
-
